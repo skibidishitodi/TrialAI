@@ -41,8 +41,11 @@ class AgentServer {
         switch (msg.type) {
             case 'register_agent':
                 this.agentClient = ws;
+                // Remove from webClients if it was added
+                this.webClients.delete(ws);
                 console.log('[Agent] Agent registered');
                 ws.send(JSON.stringify({ type: 'registered', success: true }));
+                // Notify all web clients that agent is connected
                 this.notifyWebClients({ type: 'agent_status', connected: true });
                 break;
 
