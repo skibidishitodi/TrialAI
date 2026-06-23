@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
 class AgentServer {
     constructor(wss) {
@@ -63,6 +64,7 @@ class AgentServer {
             case 'rename':
             case 'search':
             case 'file_info':
+            case 'get_home':
                 if (this.agentClient && this.agentClient.readyState === 1) {
                     msg.requestId = msg.requestId || Math.random().toString(36).slice(2);
                     this.agentClient.send(JSON.stringify(msg));

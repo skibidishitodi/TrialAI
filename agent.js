@@ -63,13 +63,13 @@ class AgentClient {
         try {
             this.ws = new WebSocket(AGENT_WS_URL);
 
-            this.ws.onopen = () => {
+            this.ws.onopen = async () => {
                 this.connected = true;
                 this.dot.classList.add('connected');
                 this.statusText.textContent = 'Agent connected';
                 this.toggleBtn.style.display = 'flex';
                 this.ws.send(JSON.stringify({ type: 'register_web' }));
-                this.currentPath = this.getHomePath();
+                await this.initHomePath();
                 this.loadDir(this.currentPath);
                 this.fileBrowser.classList.add('open');
             };
@@ -310,9 +310,24 @@ class AgentClient {
     }
 
     getHomePath() {
-        return navigator.platform.includes('Win')
-            ? (navigator.userProfile || 'C:\\Users\\' + (navigator.userAgent.match(/Windows.*?\/(.+?)\s/)?.[1] || 'User'))
-            : (navigator.userProfile || '/home/' + (navigator.userAgent.match(/Linux.*?\/(.+?)\s/)?.[1] || 'user'));
+        const ua = navigator.userAgent;
+        if (navigator.platform.includes('Win')) {
+            const match = ua.match(/Windows NT [\d.]+.*?\/(.+?)\s/);
+            return 'C:\\Users\\' + (match?.[1] || 'User');
+        }
+        const match = ua.match(/\/(.+?)\s/);
+        return '/home/' + (match?.[1] || 'user');
+    }
+
+    async initHomePath() {
+        try {
+            const resp = await this.send({ type: 'get_home' });
+            if (resp && resp.data && resp.data.home) {
+                this.currentPath = resp.data.home;
+                return;
+            }
+        } catch (e) {}
+        this.currentPath = this.getHomePath();
     }
 
     formatSize(bytes) {

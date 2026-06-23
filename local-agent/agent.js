@@ -2,8 +2,8 @@
 
 const WebSocket = require('ws');
 const fs = require('fs');
-const path = require('path');
 const os = require('os');
+const path = require('path');
 const AgentServer = require('./agent-server');
 
 const PORT = 7890;
@@ -22,6 +22,12 @@ const agent = new AgentServer(wss);
 console.log(`[Agent] Listening on ws://localhost:${PORT}`);
 console.log('[Agent] Open the AI Chat website to connect');
 console.log('');
+console.log('  Commands:');
+console.log('  - Browse files in the website sidebar');
+console.log('  - Click a file to load it into chat');
+console.log('  - Click folder icon to sync a folder (auto-refresh)');
+console.log('  - AI can read/write/delete files on your PC');
+console.log('');
 
 // File operation handlers
 async function handleRequest(msg) {
@@ -29,6 +35,9 @@ async function handleRequest(msg) {
 
     try {
         switch (type) {
+            case 'get_home':
+                return { type: 'response', requestId, data: { home: os.homedir(), platform: process.platform, separator: path.sep } };
+
             case 'list_dir': {
                 const dirPath = path.resolve(msg.path || '.');
                 const entries = fs.readdirSync(dirPath, { withFileTypes: true });
@@ -138,7 +147,7 @@ wss.on('connection', (ws) => {
     ws.on('message', async (data) => {
         try {
             const msg = JSON.parse(data.toString());
-            if (['list_dir', 'read_file', 'write_file', 'delete_file', 'create_dir', 'rename', 'search', 'file_info'].includes(msg.type)) {
+            if (['get_home', 'list_dir', 'read_file', 'write_file', 'delete_file', 'create_dir', 'rename', 'search', 'file_info'].includes(msg.type)) {
                 const response = await handleRequest(msg);
                 ws.send(JSON.stringify(response));
             }
