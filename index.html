@@ -7,27 +7,37 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>AI Chat</h1>
-            <p>Powered by Groq</p>
-        </header>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>AI Chat</h2>
+        </div>
+        <button class="new-chat-btn">+ New chat</button>
+        <div class="chat-history">
+        </div>
+    </div>
 
-        <div class="api-key-section">
-            <input type="password" id="apiKey" placeholder="Enter your Groq API Key">
-            <button id="setKeyBtn">Set Key</button>
+    <div class="main">
+        <div class="model-bar">
+            <select id="modelSelect">
+                <option value="llama-3.3-70b-versatile">Llama 3.3 70B</option>
+                <option value="llama-3.1-8b-instant">Llama 3.1 8B</option>
+                <option value="mixtral-8x7b-32768">Mixtral 8x7B</option>
+                <option value="gemma2-9b-it">Gemma 2 9B</option>
+                <option value="deepseek-r1-distill-llama-70b">DeepSeek R1 70B</option>
+                <option value="qwen-2.5-32b">Qwen 2.5 32B</option>
+            </select>
         </div>
 
-        <div class="chat-container">
-            <div id="chatMessages" class="chat-messages">
-                <div class="message bot">
-                    <div class="avatar">🤖</div>
-                    <div class="content">Hello! I'm powered by Groq's fast inference. Enter your API key above and ask me anything!</div>
-                </div>
+        <div id="chatMessages" class="chat-messages">
+            <div class="message bot">
+                <div class="avatar">AI</div>
+                <div class="content">Hello! How can I help you today?</div>
             </div>
+        </div>
 
-            <div class="chat-input-area">
-                <textarea id="userInput" placeholder="Type your message..." rows="1"></textarea>
+        <div class="input-area">
+            <div class="input-wrapper">
+                <textarea id="userInput" placeholder="Message AI Chat..." rows="1"></textarea>
                 <button id="sendBtn">Send</button>
             </div>
         </div>
