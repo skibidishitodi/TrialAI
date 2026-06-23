@@ -61,12 +61,13 @@ function renderInlineMarkdown(text) {
     return result;
 }
 
-function renderContent(text) {
-    const regex = /```(\w*)\n([\s\S]*?)```/g;
-    let html = '';
+function parseCodeBlocks(text) {
+    const regex = /```([^\s\n]*)\n([\s\S]*?)```/g;
+    const files = [];
     let lastIndex = 0;
-
+    let html = '';
     let match;
+
     while ((match = regex.exec(text)) !== null) {
         if (match.index > lastIndex) {
             const before = text.slice(lastIndex, match.index).trim();
@@ -79,7 +80,14 @@ function renderContent(text) {
         const code = match[2].replace(/\n$/, '');
         const id = 'code-' + Math.random().toString(36).slice(2, 9);
 
-        html += `<div class="code-block">
+        const looksLikeFile = lang.includes('.') || lang.includes('/') || lang.includes('\\');
+        const fileName = looksLikeFile ? lang : null;
+
+        if (fileName) {
+            files.push({ name: fileName, content: code });
+        }
+
+        html += `<div class="code-block" data-file="${fileName ? escapeHtml(fileName) : ''}">
             <div class="code-header">
                 <span>${escapeHtml(lang)}</span>
                 <button class="copy-btn" onclick="copyCode('${id}')">
@@ -90,7 +98,7 @@ function renderContent(text) {
                     Copy
                 </button>
             </div>
-            <pre><code id="${id}" class="language-${escapeHtml(lang)}">${escapeHtml(code)}</code></pre>
+            <pre><code id="${id}" class="language-${escapeHtml(fileName ? fileName.split('.').pop() : lang)}">${escapeHtml(code)}</code></pre>
         </div>`;
 
         lastIndex = regex.lastIndex;
@@ -103,7 +111,51 @@ function renderContent(text) {
         }
     }
 
-    return html || '<p>' + renderInlineMarkdown(text) + '</p>';
+    return { html: html || '<p>' + renderInlineMarkdown(text) + '</p>', files };
+}
+
+function renderContent(text) {
+    const { html, files } = parseCodeBlocks(text);
+
+    let downloadBtn = '';
+    if (files.length > 1) {
+        const zipId = 'zip-' + Math.random().toString(36).slice(2, 9);
+        downloadBtn = `<div class="download-zip-wrapper">
+            <button class="download-zip-btn" onclick="downloadZip('${zipId}')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Download all as ZIP (${files.length} files)
+            </button>
+        </div>`;
+        window['files_' + zipId] = files;
+    }
+
+    return downloadBtn + html;
+}
+
+async function downloadZip(zipId) {
+    const files = window['files_' + zipId];
+    if (!files) return;
+
+    const zip = new JSZip();
+    const folder = zip.folder('project');
+
+    for (const file of files) {
+        folder.file(file.name, file.content);
+    }
+
+    const blob = await zip.generateAsync({ type: 'blob' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'project.zip';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }
 
 function renderMarkdownBlock(text) {
@@ -209,7 +261,7 @@ async function sendMessage() {
             body: JSON.stringify({
                 model: modelSelect.value,
                 messages: [
-                    { role: 'system', content: 'You are a helpful AI assistant. When sharing code, always use markdown code blocks with the language specified (e.g. ```csharp). Format your responses nicely with paragraphs, lists, and headers when appropriate.' },
+                    { role: 'system', content: 'You are a helpful AI assistant. When sharing code, use markdown code blocks. When the user asks you to create files or a project with multiple scripts, put the filename as the first line after the opening ``` (e.g. ```main.py\\nprint("hello")```). This lets the user download all files as a ZIP. Format responses nicely with paragraphs, lists, and headers when appropriate.' },
                     ...conversationHistory
                 ],
                 temperature: 0.7,
