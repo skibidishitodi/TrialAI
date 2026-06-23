@@ -15,6 +15,18 @@
         </div>
     </div>
 
+    <div class="agent-toast" id="agentToast">
+        <div class="agent-toast-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <div class="agent-toast-text">
+            <strong>Local Agent Detected</strong>
+            <span>Connect to access your files?</span>
+        </div>
+        <button class="agent-toast-btn" id="agentConnectBtn">Connect</button>
+        <button class="agent-toast-dismiss" id="agentDismissBtn">&times;</button>
+    </div>
+
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="logo">
@@ -41,6 +53,14 @@
             New chat
         </button>
         <div class="chat-history" id="chatHistory"></div>
+
+        <div class="agent-status" id="agentStatus">
+            <div class="agent-status-dot" id="agentDot"></div>
+            <span id="agentStatusText">Agent offline</span>
+            <button class="icon-btn" id="agentToggleBtn" title="File Browser" style="display:none;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+            </button>
+        </div>
         <div class="sidebar-footer">
             <div class="model-selector">
                 <label>Chat Model</label>
@@ -174,9 +194,43 @@
         </div>
     </div>
 
+    <div class="file-browser-panel" id="fileBrowser">
+        <div class="fb-header">
+            <span class="fb-title">File Browser</span>
+            <div class="fb-actions">
+                <button class="icon-btn" id="fbUpBtn" title="Go up">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+                </button>
+                <button class="icon-btn" id="fbRefreshBtn" title="Refresh">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+                </button>
+                <button class="icon-btn" id="fbSyncBtn" title="Sync this folder">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+                </button>
+                <button class="icon-btn" id="fbNewFileBtn" title="New file">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+                </button>
+                <button class="icon-btn" id="fbNewFolderBtn" title="New folder">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+                </button>
+                <button class="icon-btn" id="fbCloseBtn" title="Close">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+        </div>
+        <div class="fb-breadcrumb" id="fbBreadcrumb"></div>
+        <div class="fb-search">
+            <input type="text" id="fbSearch" placeholder="Search files...">
+        </div>
+        <div class="fb-list" id="fbList">
+            <div class="fb-empty">Connect to the local agent to browse files</div>
+        </div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/csharp.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="script.js"></script>
+    <script src="agent.js"></script>
 </body>
 </html>

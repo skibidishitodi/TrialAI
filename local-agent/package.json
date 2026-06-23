@@ -1,0 +1,19 @@
+{
+  "name": "ai-chat-agent",
+  "version": "1.0.0",
+  "description": "Local file system agent for AI Chat",
+  "main": "agent.js",
+  "bin": "agent.js",
+  "scripts": {
+    "start": "node agent.js",
+    "build": "pkg agent.js --targets node18-win-x64 --output AI-Chat-Agent.exe"
+  },
+  "dependencies": {
+    "ws": "^8.16.0",
+    "chokidar": "^3.5.3"
+  },
+  "pkg": {
+    "assets": [],
+    "targets": ["node18-win-x64"]
+  }
+}
