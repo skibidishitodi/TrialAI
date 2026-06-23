@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat - Powered by Groq</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AI Chat</h1>
+            <p>Powered by Groq</p>
+        </header>
+
+        <div class="api-key-section">
+            <input type="password" id="apiKey" placeholder="Enter your Groq API Key">
+            <button id="setKeyBtn">Set Key</button>
+        </div>
+
+        <div class="chat-container">
+            <div id="chatMessages" class="chat-messages">
+                <div class="message bot">
+                    <div class="avatar">🤖</div>
+                    <div class="content">Hello! I'm powered by Groq's fast inference. Enter your API key above and ask me anything!</div>
+                </div>
+            </div>
+
+            <div class="chat-input-area">
+                <textarea id="userInput" placeholder="Type your message..." rows="1"></textarea>
+                <button id="sendBtn">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
