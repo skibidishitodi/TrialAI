@@ -931,9 +931,7 @@ body {
 .message-actions {
     display: flex;
     gap: 4px;
-    margin-left: 46px;
-    margin-top: -4px;
-    margin-bottom: 4px;
+    margin-top: 4px;
 }
 
 .msg-action-btn {

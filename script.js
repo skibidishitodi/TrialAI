@@ -276,12 +276,12 @@ function appendBotMessage(text) {
     const div = document.createElement('div');
     div.className = 'message bot';
     div.innerHTML = '<div class="avatar">AI</div>' +
-        '<div class="content">' + contentHtml + '</div>' +
+        '<div class="content">' + contentHtml +
         '<div class="message-actions">' +
         '<button class="msg-action-btn" onclick="textToSpeech(\'' + ttsId + '\', this)" title="Read aloud">' +
         '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
-        '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg>' +
-        '</button></div>';
+        '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 010 7.07"/></svg>' +
+        '</button></div></div>';
     div.id = ttsId;
     div.dataset.rawText = text;
     chatMessages.appendChild(div);
@@ -801,14 +801,14 @@ async function sendMessage() {
 
         contentEl.classList.remove('streaming-cursor');
 
-        // Add TTS button
+        // Add TTS button inside content
         const ttsId = 'tts-' + Math.random().toString(36).slice(2, 9);
         const actionsDiv = document.createElement('div');
         actionsDiv.className = 'message-actions';
         actionsDiv.innerHTML = '<button class="msg-action-btn" onclick="textToSpeech(\'' + ttsId + '\', this)" title="Read aloud">' +
             '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
             '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 010 7.07"/></svg></button>';
-        botDiv.appendChild(actionsDiv);
+        contentEl.appendChild(actionsDiv);
         botDiv.id = ttsId;
         botDiv.dataset.rawText = fullReply;
 
@@ -839,6 +839,10 @@ async function sendMessage() {
 }
 
 // --- Init ---
+
+window.onerror = function(msg, url, line) {
+    console.error('JS Error:', msg, 'at', url, 'line', line);
+};
 
 systemPromptInput.value = systemPrompt;
 ttsVoiceSelect.value = ttsVoice;
