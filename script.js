@@ -61,14 +61,49 @@ function renderInlineMarkdown(text) {
     return result;
 }
 
+function guessFileName(lang, code, textBefore) {
+    if (lang.includes('.') || lang.includes('/') || lang.includes('\\')) {
+        return lang;
+    }
+
+    const commentPatterns = [
+        /^--\s*(.+\.\w+)\s*$/m,
+        /^#\s*(.+\.\w+)\s*$/m,
+        /^\/\/\s*(.+\.\w+)\s*$/m,
+        /^;\s*(.+\.\w+)\s*$/m,
+        /^\/\*\s*(.+\.\w+)\s*\*\//m,
+        /^--\[\[\s*(.+\.\w+)\s*\]\]/m,
+    ];
+    for (const p of commentPatterns) {
+        const m = code.match(p);
+        if (m) return m[1].trim();
+    }
+
+    if (textBefore) {
+        const namePatterns = [
+            /(?:file|called|named|create|save)\s+['"`]([^'"`]+\.\w+)['"`]/i,
+            /(?:file|called|named|create|save)\s+(\S+\.\w+)/i,
+        ];
+        for (const p of namePatterns) {
+            const m = textBefore.match(p);
+            if (m) return m[1].trim();
+        }
+    }
+
+    return null;
+}
+
 function parseCodeBlocks(text) {
     const regex = /```([^\s\n]*)\n([\s\S]*?)```/g;
     const files = [];
     let lastIndex = 0;
     let html = '';
     let match;
+    let codeIndex = 0;
 
     while ((match = regex.exec(text)) !== null) {
+        const textBefore = text.slice(Math.max(0, match.index - 200), match.index).trim();
+
         if (match.index > lastIndex) {
             const before = text.slice(lastIndex, match.index).trim();
             if (before) {
@@ -80,16 +115,16 @@ function parseCodeBlocks(text) {
         const code = match[2].replace(/\n$/, '');
         const id = 'code-' + Math.random().toString(36).slice(2, 9);
 
-        const looksLikeFile = lang.includes('.') || lang.includes('/') || lang.includes('\\');
-        const fileName = looksLikeFile ? lang : null;
-
-        if (fileName) {
-            files.push({ name: fileName, content: code });
+        let fileName = guessFileName(lang, code, textBefore);
+        if (!fileName) {
+            const ext = lang !== 'code' ? lang : 'txt';
+            fileName = `file${codeIndex + 1}.${ext}`;
         }
+        files.push({ name: fileName, content: code });
 
-        html += `<div class="code-block" data-file="${fileName ? escapeHtml(fileName) : ''}">
+        html += `<div class="code-block" data-file="${escapeHtml(fileName)}">
             <div class="code-header">
-                <span>${escapeHtml(lang)}</span>
+                <span>${escapeHtml(fileName)}</span>
                 <button class="copy-btn" onclick="copyCode('${id}')">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
@@ -98,9 +133,10 @@ function parseCodeBlocks(text) {
                     Copy
                 </button>
             </div>
-            <pre><code id="${id}" class="language-${escapeHtml(fileName ? fileName.split('.').pop() : lang)}">${escapeHtml(code)}</code></pre>
+            <pre><code id="${id}" class="language-${escapeHtml(fileName.split('.').pop())}">${escapeHtml(code)}</code></pre>
         </div>`;
 
+        codeIndex++;
         lastIndex = regex.lastIndex;
     }
 
